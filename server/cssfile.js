@@ -1,4 +1,3 @@
-var csslint = require('csslint').CSSLint;
 var cssparser = require('postcss');
 
 function CssFile(source, path, callback){
@@ -35,19 +34,6 @@ CssFile.prototype.selectorFromPosition = function(line, column){
 };
 
 CssFile.prototype.setContent = function(source, callback){
-	var messages = csslint.verify(source).messages;
-	var errors = [];
-	messages.forEach(function(msg){
-		if(msg.type == 'error'){
-			errors.push(msg);
-		}
-	});
-
-	if(errors.length > 0 && callback){
-		callback(errors);
-		return;
-	}
-
 	var changed = (this.source != undefined && this.source != source);
 
 	this.source = source;
