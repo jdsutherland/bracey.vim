@@ -1,4 +1,4 @@
-var cssparser = require('postcss');
+const cssparser = require('postcss');
 
 function CssFile(source, path, callback){
 	callback = callback || function(){}
@@ -10,23 +10,16 @@ CssFile.prototype.webSrc = function(){
 	return this.source;
 };
 
-CssFile.prototype.selectorFromPosition = function(line, column){
+CssFile.prototype.selectorFromPosition = function(line){
 	for (const rule of this.parsed.nodes) {
 		const {
-			start: { line: startLine, column: startColumn },
-			end: { line: endLine, column: endColumn },
+			start: { line: startLine },
+			end: { line: endLine },
 		} = rule.source
 		if((startLine < line && endLine > line)
-			|| (startLine == line
-				&& endLine != line
-				&& startColumn <= line)
-			|| (startLine != line
-				&& endLine == line
-				&& startColumn >= line)
-			|| (startLine == line
-				&& endLine == line
-				&& startColumn <= line
-				&& endColumn >= line)){
+			|| (startLine == line && endLine != line)
+			|| (startLine != line && endLine == line)
+			|| (startLine == line && endLine == line)){
 			return rule.selector || null;
 		}
 	}
@@ -44,13 +37,6 @@ CssFile.prototype.setContent = function(source, callback){
 		callback(err);
 		return;
 	}
-
-	this.parsed.nodes.forEach(rule => {
-		var source = rule.source;
-		source.start.line--;
-		source.start.column--;
-		source.end.column++;
-	});
 
 	if(changed){
 		callback(null);
